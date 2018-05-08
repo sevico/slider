@@ -1,16 +1,32 @@
-class Slider {
-    constructor(id, opts = {images: [], cycle: 3000}) {
-        this.container = document.getElementById(id)
-        this.options = opts
-        this.container.innerHTML = this.render()
+class Component{
+    constructor(id, opts = {data:[]}){
+        this.container = document.getElementById(id);
+        this.options = opts;
+        this.container.innerHTML = this.render(opts.data);
+    }
+    registerPlugins(...plugins){
+        plugins.forEach(plugin=>{
+            const pluginContainer = document.createElement("div")
+            pluginContainer.className = '.slider-list__plugin'
+            pluginContainer.innerHTML = plugin.render(this.options.data)
+            this.container.appendChild(pluginContainer)
+            plugin.action(this)
+        })
+    }
+    render(data){
+        return ""
+    }
+}
+class Slider extends Component{
+    constructor(id, opts = {data: [], cycle: 3000}) {
+        super(id,opts)
         this.items = this.container.querySelectorAll('.slider-list__item, .slider-list__item--selected');
         this.cycle = opts.cycle || 3000
         this.slideTo(0)
     }
 
-    render() {
-        const images = this.options.images
-        const content = images.map(image => `
+    render(data) {
+        const content = data.map(image => `
             <li class="slider-list__item">
                 <img src="${image}"/>
             </li>
@@ -22,16 +38,16 @@ class Slider {
         this.container.addEventListener(type, handler)
     }
 
-    registerPlugins(...plugins) {
-        plugins.forEach(plugin => {
-            const pluginContainer = document.createElement('div')
-            pluginContainer.className = '.slider-list__plugin'
-            pluginContainer.innerHTML = plugin.render(this.options.images)
-            this.container.appendChild(pluginContainer)
-
-            plugin.action(this)
-        })
-    }
+    // registerPlugins(...plugins) {
+    //     plugins.forEach(plugin => {
+    //         const pluginContainer = document.createElement('div')
+    //         pluginContainer.className = '.slider-list__plugin'
+    //         pluginContainer.innerHTML = plugin.render(this.options.images)
+    //         this.container.appendChild(pluginContainer)
+    //
+    //         plugin.action(this)
+    //     })
+    // }
 
     getSelectedItem() {
         const selected = this.container.querySelector(".slider-list__item--selected")
@@ -148,7 +164,7 @@ const pluginNext = {
     }
 }
 
-const slider = new Slider('my-slider', {images: ['https://p5.ssl.qhimg.com/t0119c74624763dd070.png',
+const slider = new Slider('my-slider', {data: ['https://p5.ssl.qhimg.com/t0119c74624763dd070.png',
         'https://p4.ssl.qhimg.com/t01adbe3351db853eb3.jpg',
         'https://p2.ssl.qhimg.com/t01645cd5ba0c3b60cb.jpg',
         'https://p4.ssl.qhimg.com/t01331ac159b58f5478.jpg'], cycle:3000});
